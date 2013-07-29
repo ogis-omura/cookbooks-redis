@@ -27,8 +27,16 @@ end
 bash "install_redis" do
   cwd "/tmp"
   code <<-EOH
-    tar zxvf #{file}.tar.gz && cd #{file} && make && make install && cp utils/redis_init_script /etc/init.d/redis && mkdir /etc/redis/ && cp redis.conf /etc/redis/6379.conf
+    tar zxvf #{file}.tar.gz && cd #{file} && make && make install && cp utils/redis_init_script /etc/init.d/redis && mkdir /etc/redis/
   EOH
+  only_if { do_install }
+end
+
+template "/etc/redis/6379.conf" do
+  source "redis.conf.erb"
+  variables({
+    :isdaemon => node[:redis][:isdaemon]
+  })
   only_if { do_install }
 end
 
